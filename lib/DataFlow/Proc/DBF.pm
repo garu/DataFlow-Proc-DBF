@@ -6,6 +6,7 @@ use strict;
 our $VERSION = '0.01';
 
 use Moose;
+use MooseX::Aliases;
 extends 'DataFlow::Proc::Converter';
 
 use XBase;
@@ -25,6 +26,28 @@ has '+converter' => (
 
 has '+converter_opts' => ( 'init_arg' => 'dbf_opts', );
 
+has 'header' => (
+    'is'        => 'rw',
+    'isa'       => 'ArrayRef[Maybe[Str]]',
+    'predicate' => 'has_header',
+    'alias'     => 'headers',
+    'handles'   => { 'has_headers' => sub { shift->has_header }, },
+);
+
+
+ 
+has 'header_wanted' => (
+    'is'      => 'rw',
+    'isa'     => 'Bool',
+    'lazy'    => 1,
+    'default' => sub {
+        my $self = shift;
+        return 0 if $self->direction eq 'CONVERT_FROM';
+        return $self->has_header;
+    },
+);
+
+
 sub _policy {
     return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
 }
@@ -33,7 +56,6 @@ sub _build_subs {
     my $self = shift;
     return {
         'CONVERT_TO' => sub {
-            die 'Not implemented (yet)';
         },
         'CONVERT_FROM' => sub {
             my $string = shift;
@@ -63,7 +85,12 @@ sub _build_subs {
                 or die XBase->errstr;
 
             my $records = $dbf->get_all_records;
-            unshift @$records, [$dbf->field_names];
+
+            if ($self->header_wanted) {
+                $self->header_wanted(0);
+                unshift @$records, [$dbf->field_names]
+            }
+
             $dbf->close;
             return $records;
         },
