@@ -11,6 +11,7 @@ extends 'DataFlow::Proc::Converter';
 
 use XBase;
 use File::Temp qw(:seekable);
+use File::Spec ();
 use namespace::autoclean;
 
 has '+converter' => (
@@ -56,6 +57,42 @@ sub _build_subs {
     my $self = shift;
     return {
         'CONVERT_TO' => sub {
+            my $data = $_;
+            my $dir = File::Temp->newdir();
+            my $filename = File::Spec->catfile($dir, 'tmp.dbf');
+
+            # header is mandatory, so we either
+            # use one provided by the user,
+            # or create our own "fake" version
+            my $field_names;
+            if ($self->header_wanted) {
+                $self->header_wanted(0);
+                $field_names = $self->header;
+            }
+            else {
+                push @$field_names, "item$_"
+                    foreach ( 0 .. $#{$data} );
+            }
+
+            my $table = $self->converter->create(
+                name           => $filename,
+                field_names    => $field_names,
+                field_types    => [],
+                field_lengths  => [],
+                field_decimals => [],
+            ) or die 'error creating DBF: ' . $self->converter->errstr;
+
+            foreach my $i ( 0 .. $#{$data} ) {
+                $table->set_record($i, @{ $data->[$i] } );
+            }
+
+            $table->close;
+
+            # temporary DBF file saved. Get the content back
+            open my $fh, '<', $filename;
+            binmode $fh;
+            my $content = do { local $/; <$fh> };
+            return $content;
         },
 
         'CONVERT_FROM' => sub {
