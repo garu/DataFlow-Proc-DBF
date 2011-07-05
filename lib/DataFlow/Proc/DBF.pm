@@ -63,6 +63,7 @@ sub _build_subs {
                 or die XBase->errstr;
 
             my $records = $dbf->get_all_records;
+            unshift @$records, [$dbf->field_names];
             $dbf->close;
             return $records;
         },
