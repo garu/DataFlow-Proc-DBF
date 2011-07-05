@@ -57,8 +57,9 @@ sub _build_subs {
     return {
         'CONVERT_TO' => sub {
         },
+
         'CONVERT_FROM' => sub {
-            my $string = shift;
+            my $string = $_;
 
             my $options = $self->has_converter_opts
                         ? $self->converter_opts : {}
