@@ -127,7 +127,7 @@ sub _build_subs {
 
             if ($self->header_wanted) {
                 $self->header_wanted(0);
-                unshift @$records, [$dbf->field_names]
+                $self->header( [$dbf->field_names] );
             }
 
             $dbf->close;
