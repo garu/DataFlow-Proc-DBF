@@ -174,36 +174,22 @@ DataFlow::Proc::DBF - A dBase DBF converting processor
   
 =head1 DESCRIPTION
 
-
-=head1 INTERFACE 
-
-=for author to fill in:
-    Write a separate section listing the public components of the modules
-    interface. These normally consist of either subroutines that may be
-    exported, or methods that may be called on objects belonging to the
-    classes provided by the module.
-
+This module provides a processing step for dBase (DBF) files under L<DataFlow>.
 
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item C<< Error message here, perhaps with %s placeholders >>
+=item C<< Error creating DBF: $MESSAGE >>
 
-[Description of error here]
+The conversor was unable to create a DBF file with the provided structure.
+Make sure you pass a matrix with lines containing the same number of elements.
 
 =back
 
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-=for author to fill in:
-    A full explanation of any configuration system(s) used by the
-    module, including the names and locations of any configuration
-    files, and the meaning of any environment variables or properties
-    that can be set. These descriptions must also include details of any
-    configuration language used.
-  
 DataFlow::Proc::DBF requires no configuration files or environment variables.
 
 
@@ -216,7 +202,7 @@ L<http://rt.cpan.org>.
 
 =head1 SEE ALSO
 
-L<DataFlow>
+L<DataFlow>, L<XBase>
 
 =head1 AUTHOR
 
