@@ -4,6 +4,5 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00.load.t
-t/perlcritic.t
-t/pod-coverage.t
+t/01.dbf.t
 t/pod.t
