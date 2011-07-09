@@ -12,6 +12,7 @@ extends 'DataFlow::Proc::Converter';
 use XBase;
 use File::Temp qw(:seekable);
 use File::Spec ();
+use autodie;
 use namespace::autoclean;
 
 has '+converter' => (
@@ -58,7 +59,7 @@ sub _build_subs {
     return {
         'CONVERT_TO' => sub {
             my $data = $_;
-            my $dir = File::Temp->newdir();
+            my $dir = File::Temp->newdir( CLEANUP => 1 );
             my $filename = File::Spec->catfile($dir, 'tmp.dbf');
 
             # header is mandatory, so we either
@@ -71,7 +72,7 @@ sub _build_subs {
             }
             else {
                 push @$field_names, "item$_"
-                    foreach ( 0 .. $#{$data} );
+                    foreach ( 0 .. $#{ $data->[0] } );
             }
 
             my $table = $self->converter->create(
@@ -97,7 +98,6 @@ sub _build_subs {
 
         'CONVERT_FROM' => sub {
             my $string = $_;
-
             my $options = $self->has_converter_opts
                         ? $self->converter_opts : {}
                         ;
@@ -109,17 +109,18 @@ sub _build_subs {
             # assume the DBF is in a binary string 
             # (the "flow") and make our interface with
             #  XBase using a temp file
+            my $fh;
             unless (exists $options->{'name'} or exists $options->{'fh'}) {
-                my $fh = File::Temp->new( UNLINK => 1 );
+                $fh = File::Temp->new( UNLINK => 1 );
                 binmode $fh;
                 print $fh $string;
-                $fh->seek(0, SEEK_SET);
+                close $fh;
 
-                $options->{name} = '-';
-                $options->{fh}   = $fh;
+                $options->{name} = $fh->filename;
             }
 
-            $dbf = $self->converter->open( %$options )
+            $dbf = $self->converter;
+            $dbf->open( %$options )
                 or die XBase->errstr;
 
             my $records = $dbf->get_all_records;
