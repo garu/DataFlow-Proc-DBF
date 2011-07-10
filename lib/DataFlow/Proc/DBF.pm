@@ -150,31 +150,68 @@ DataFlow::Proc::DBF - A dBase DBF converting processor
 
     use DataFlow;
 
-    # simple flow
-    my $simple = DataFlow( 'DBF' );
-
-    # chained flow
-    my $chained = DataFlow([
-        ...     # (any procs you want in your flow)
-        'DBF',  # DataFlow::Proc::DBF
-        ...     # (any other procs you want in your flow)
+    # creating our flow
+    my $flow = DataFlow->new([
+       [ 'DBF' => { direction => 'CONVERT_FROM' } ],
     ]);
 
 
-    # passing parameters
-    my $flow_with_args = DataFlow([
-       ...
-       [ 'DBF' => {
-           direction => 'CONVERT_FROM',
-         }
-       ],
-       ...
-    ]);
+    # getting back a perl arrayref
+    my $perl_struct = $flow->process( $slurped_dbf_data );
+
 
   
 =head1 DESCRIPTION
 
-This module provides a processing step for dBase (DBF) files under L<DataFlow>.
+This module provides a processing step for dBase (DBF) files under
+L<DataFlow>. It lets you C<CONVERT_FROM> a DBF file into a Perl
+data structure (in this case, an array reference) and C<CONVERT_TO>
+a DBF stream, from a Perl array reference (the stream can be saved
+into a file for later inspection with dBase).
+
+=head1 OPTIONS
+
+=head2 direction
+
+=over 4
+
+=item * CONVERT_FROM
+
+Converts FROM a DBF stream or file into a Perl array reference.
+
+=item * CONVERT_TO
+
+Converts TO a a DBF stream or file, from a Perl array reference.
+
+=back
+
+=head2 header_wanted
+
+Saves the header of the structure into C<< $proc->header >>. You can
+reach it via C<< $flow->procs->[ $i ]->header >>, where C<$i> is the
+index of the DBF processor in your flow. For example:
+
+  my $flow = DataFlow->new([
+      [ 'DBF' => { direction => 'CONVERT_FROM', header_wanted => 1 } ],
+  ]);
+
+  my $perl_data = $flow->process( $dbf_data );
+  my $header    = $flow->procs->[0]->header;
+
+=head2 dbf_opts
+
+  my $flow = DataFlow->new([
+     [ 'DBF' => {
+         direction => 'CONVERT_FROM',
+         dbf_opts  => { name => 'dbase.dbf' },
+       }
+     ],
+  ]);
+
+Sets any particular option you may want to pass to L<XBase>. The most
+important one being B<name>, in which you can specify a file name
+for either input (CONVERT_FROM) or output (CONVERT_TO).
+
 
 =head1 DIAGNOSTICS
 
