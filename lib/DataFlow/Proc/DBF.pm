@@ -59,8 +59,14 @@ sub _build_subs {
     return {
         'CONVERT_TO' => sub {
             my $data = $_;
-            my $dir = File::Temp->newdir( CLEANUP => 1 );
-            my $filename = File::Spec->catfile($dir, 'tmp.dbf');
+            my $options = $self->has_converter_opts
+                        ? $self->converter_opts : {}
+                        ;
+
+            unless (exists $options->{'name'}) {
+                $options->{'dir'}  = File::Temp->newdir( CLEANUP => 1 );
+                $options->{'name'} = File::Spec->catfile($options->{'dir'}, 'tmp.dbf');
+            }
 
             # header is mandatory, so we either
             # use one provided by the user,
@@ -76,7 +82,7 @@ sub _build_subs {
             }
 
             my $table = $self->converter->create(
-                name           => $filename,
+                name           => $options->{'name'},
                 field_names    => $field_names,
                 field_types    => [],
                 field_lengths  => [],
@@ -90,7 +96,7 @@ sub _build_subs {
             $table->close;
 
             # temporary DBF file saved. Get the content back
-            open my $fh, '<', $filename;
+            open my $fh, '<', $options->{'name'};
             binmode $fh;
             my $content = do { local $/; <$fh> };
             return $content;
