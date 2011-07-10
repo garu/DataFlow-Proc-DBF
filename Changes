@@ -1,5 +1,9 @@
 Revision history for DataFlow-Proc-DBF
 
+0.02  10/07/2011
+      CONVERT_TO can also handle file names
+      improved documentation
+
 0.01  09/07/2011
       Initial release.
 
