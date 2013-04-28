@@ -2,6 +2,8 @@ Revision history for DataFlow-Proc-DBF
 
 0.03  2013-04-28
       - compliance to CPAN::Changes::Spec
+      - repository information
+      - increasing DataFlow version dep
 
 0.02  2011-07-10
       - CONVERT_TO can also handle file names
