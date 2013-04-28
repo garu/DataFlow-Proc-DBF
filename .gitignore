@@ -1,4 +1,6 @@
 blib*
+*swp
+MYMETA*
 Makefile
 Makefile.old
 Build
