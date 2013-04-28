@@ -10,8 +10,8 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More'           => 0,
-        'DataFlow'             => 0,
-        'Moose'                => 0,
+        'DataFlow'             => 1.111480, # DataFlow::Proc::Converter
+        'Moose'                => 1.09,
         'MooseX::Aliases'      => 0,
         'XBase'                => 0,
         'File::Temp'           => 0,
