@@ -19,6 +19,15 @@ WriteMakefile(
         'autodie'              => 0,
         'namespace::autoclean' => 0,
     },
+
+    META_MERGE      => {
+        resources => {
+            license     =>      'http://dev.perl.org/licenses/',
+            bugtracker  =>      'http://rt.cpan.org/NoAuth/Bugs.html?Dist=DataFlow-Proc-DBF',
+            repository  =>      'http://github.com/garu/DataFlow-Proc-DBF',
+        },
+    },
+
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'DataFlow-Proc-DBF-*' },
 );
